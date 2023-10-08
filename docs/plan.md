@@ -17,8 +17,8 @@ Chcemy to stworzyć z wykorzystaniem Serverlessowych serwisów w AWSie
 ## Metody wytwarzania oprogramowania
 <br>
 
-- Agile,
-- Narzędzia do trackowania tasków (github, JIRA, YouTrack, ClickUp),
+- Scrum
+- Narzędzia do trackowania tasków (nie wiem),
 
 ---
 <!-- _class: lead -->
@@ -26,7 +26,7 @@ Chcemy to stworzyć z wykorzystaniem Serverlessowych serwisów w AWSie
 
 Ustalenie:
 
-- chat (discord/slack)
+- chat (discord)
 - syncs, project meetings,
 - github (workflow),
 - board.
