@@ -87,7 +87,7 @@ BackEnd
 
 DevOps Dominik Gadomski<br />
 FrontEnd Filip Jakubczak<br />
-BackEnd Damian Wyrbiński 
+BackEnd Damian Wyrwiński 
 
 ---
 <!-- _class: lead -->
