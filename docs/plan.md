@@ -33,18 +33,10 @@ Ustalenie:
 
 ---
 <!-- _class: lead -->
-## Teams
-<br>
-
-- [Product teams vs feature teams](https://www.svpg.com/product-vs-feature-teams/),
-- Organizacja zespołów (patrze [team topologies](https://teamtopologies.com/key-concepts)).
-
----
-<!-- _class: lead -->
 ## Metoda dostarczania nowych wersji
 <br />
 
-- Continuous Delivery,
+- CI/CD with circleCI,
 - github workflow.
 
 ---
@@ -52,9 +44,10 @@ Ustalenie:
 ## Podstawowa architektura aplikacji
 <br />
 
-- Wstępne ustalenie stacku technologicznego,
-- Sposób udostępniania aplikacji użytkownikom,
-- Monolit vs Mikroserwisy,
+- Wstępne ustalenie stacku technologicznego:
+- AWS Lambda, Amazon S3, Amazon DynamboDB, html
+- AWS Lambda,
+- Serverless
 - -&gt; architektura (draw.io),
 - -&gt; design doc.
 
@@ -64,8 +57,11 @@ Ustalenie:
 <br />
 
 - Czy spodziewamy się zmiennej ilości użytkowników?
+- TAK aplikacja jest serverlessowa więc dla nas skalowalność jest high priority
 - Czy zmienność może mieć charakter okresowy, czy raczej będzie to jednorodny trend?
+- Będzie to okresowa zmienność ze względu na sezony pyleń
 - Czy potrzebujemy niezależnego skalowania komponentów aplikacji?
+- Nie
 - Napkin math &amp; perf testing
 
 -&gt; design doc
@@ -75,25 +71,26 @@ Ustalenie:
 ## Elementy aplikacji
 <br />
 
-- Frontend
-- Backend
-- Bazy Danych
-- Warstwa serwerowa
-- Warstwa sieciowa
+- Frontend HTML
+- Backend AWS Lambda
+- Bazy Danych DynamoDB
+- Warstwa serwerowa Brak
+- Warstwa sieciowa Brak
 
 ---
 <!-- _class: lead -->
 # Podział na role
-
+DevOps
+FrontEnd
+BackEnd
 ---
 <!-- _class: lead -->
 ## Role w projekcie
 <br />
 
-- Owner projektu / lead (nie koniecznie menager!),
-- Frontend,
-- Backend,
-- ...
+DevOps Dominik Gadomski<br />
+FrontEnd Filip Jakubczak<br />
+BackEnd Damian Wyrbiński 
 
 ---
 <!-- _class: lead -->
