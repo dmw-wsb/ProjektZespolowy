@@ -7,8 +7,8 @@ BackEnd Damian Wyrbiński
 ## Podstawowe pytania
 <br />
 
-Chcemy stworzyć aplikację dla alergików, aby ci mieli łatwy dostęp do infomacji czy powinni dzisiaj wziąć leki czy też może lepiej żeby zostali w domu.
-Chcemy ją stworzyć żeby ułatwić życie alergiką 
+Chcemy stworzyć aplikację dla alergików, aby ci mieli łatwy dostęp do infomacji czy powinni dzisiaj wziąć leki czy też może lepiej żeby zostali w domu.<br />
+Chcemy ją stworzyć żeby ułatwić życie alergiką <br />
 Chcemy to stworzyć z wykorzystaniem Serverlessowych serwisów w AWSie
 - -&gt; design doc.
 
