@@ -1,8 +1,5 @@
 <!-- _class: lead -->
 # Techniczne aspekty i role w projekcie
-DevOps Dominik Gadomski<br />
-FrontEnd Filip Jakubczak<br />
-BackEnd Damian Wyrbiński 
 <!-- _class: lead -->
 ## Podstawowe pytania
 <br />
