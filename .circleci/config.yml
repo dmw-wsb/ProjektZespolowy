@@ -12,9 +12,6 @@ workflows:
             branches:
               only: main
       - terraform/plan:
-          context: your-context
-          backend_config_file: 'backend.tf'
-          var_file: 'variables.tf'
           requires:
             - approval-plan # Planowanie wymaga zatwierdzenia
           filters:
@@ -26,7 +23,6 @@ workflows:
             branches:
               only: main
       - terraform/apply:
-          context: your-context
           backend_config_file: 'backend.tf'
           var_file: 'variables.tf'
           requires:
@@ -35,7 +31,6 @@ workflows:
             branches:
               only: main
       - terraform/destroy: # Dodajemy zadanie terraform/destroy
-          context: your-context
           backend_config_file: 'backend.tf'
           var_file: 'variables.tf'
           requires:
