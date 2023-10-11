@@ -1,82 +1,46 @@
 version: 2.1
+orbs:
+  terraform: circleci/terraform@x.y
 
-jobs:
-  plan-apply:
-    working_directory: /tmp/project
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - checkout
-      - run:
-          name: terraform init & plan
-          command: |
-            ls -ltr ~/.ssh
-            terraform init -input=false
-            terraform plan -out tfapply -var-file terraform.tfvars
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
-  apply:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform
-          command: |
-            terraform apply -auto-approve tfapply
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
-  plan-destroy:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform create destroy plan
-          command: |
-            terraform plan -destroy -out tfdestroy -var-file terraform.tfvars
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
-  destroy:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform destroy
-          command: |
-            terraform apply -auto-approve tfdestroy
 workflows:
-  version: 2.1
-  plan_approve_apply:
+  version: 2
+  deploy-infrastructure:
     jobs:
-      - plan-apply
-      - hold-apply:
+      - approval-plan: # Dodajemy zadanie zatwierdzenia przed planowaniem
           type: approval
+          filters:
+            branches:
+              only: main
+      - terraform/plan:
+          context: your-context
+          backend_config_file: 'backend.tf'
+          var_file: 'variables.tf'
           requires:
-            - plan-apply
-      - apply:
-          requires:
-            - hold-apply
-      - plan-destroy:
-          requires:
-            - apply
-      - hold-destroy:
+            - approval-plan # Planowanie wymaga zatwierdzenia
+          filters:
+            branches:
+              only: main
+      - approval-destroy: # Dodajemy zadanie zatwierdzenia przed zniszczeniem
           type: approval
+          filters:
+            branches:
+              only: main
+      - terraform/apply:
+          context: your-context
+          backend_config_file: 'backend.tf'
+          var_file: 'variables.tf'
           requires:
-            - plan-destroy
-      - destroy:
+            - terraform/plan
+          filters:
+            branches:
+              only: main
+      - terraform/destroy: # Dodajemy zadanie terraform/destroy
+          context: your-context
+          backend_config_file: 'backend.tf'
+          var_file: 'variables.tf'
           requires:
-            - hold-destroy
+            - approval-destroy # Zniszczenie wymaga zatwierdzenia
+            - terraform/apply # Zniszczenie wymaga zakończonego zadania terraform/apply
+          filters:
+            branches:
+              only: main
