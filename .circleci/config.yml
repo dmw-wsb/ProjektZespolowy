@@ -8,6 +8,10 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
+      - persist_to_workspace: # This saves job artifacts to be used by downstream jobs
+          root: . # This specifies the directory to save (current directory)
+          paths: # Specify the directories and files to save
+            - "*"
 
 workflows:
   version: 2
@@ -24,10 +28,12 @@ workflows:
       - terraform/plan:
           requires:
             - approval-plan
-            - checkout_code
           filters:
             branches:
               only: main
+          steps:
+            - attach_workspace: # This step retrieves data saved in the previous job
+                at: . # The directory where the data should be loaded
       - approval-destroy:
           type: approval
           requires:
@@ -38,10 +44,12 @@ workflows:
       - terraform/apply:
           requires:
             - terraform/plan
-            - checkout_code
           filters:
             branches:
               only: main
+          steps:
+            - attach_workspace:
+                at: .
       - terraform/destroy:
           requires:
             - approval-destroy
@@ -49,3 +57,6 @@ workflows:
           filters:
             branches:
               only: main
+          steps:
+            - attach_workspace:
+                at: .
