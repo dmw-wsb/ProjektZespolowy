@@ -8,9 +8,9 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - persist_to_workspace: # This saves job artifacts to be used by downstream jobs
-          root: . # This specifies the directory to save (current directory)
-          paths: # Specify the directories and files to save
+      - persist_to_workspace:
+          root: .
+          paths:
             - "*"
 
 workflows:
@@ -31,9 +31,9 @@ workflows:
           filters:
             branches:
               only: main
-          steps:
-            - attach_workspace: # This step retrieves data saved in the previous job
-                at: . # The directory where the data should be loaded
+          pre-steps:  # These steps run before the orb's steps
+            - attach_workspace:
+                at: .
       - approval-destroy:
           type: approval
           requires:
@@ -47,7 +47,7 @@ workflows:
           filters:
             branches:
               only: main
-          steps:
+          pre-steps:
             - attach_workspace:
                 at: .
       - terraform/destroy:
@@ -57,6 +57,6 @@ workflows:
           filters:
             branches:
               only: main
-          steps:
+          pre-steps:
             - attach_workspace:
                 at: .
