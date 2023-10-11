@@ -23,16 +23,12 @@ workflows:
             branches:
               only: main
       - terraform/apply:
-          backend_config_file: 'backend.tf'
-          var_file: 'variables.tf'
           requires:
             - terraform/plan
           filters:
             branches:
               only: main
       - terraform/destroy: # Dodajemy zadanie terraform/destroy
-          backend_config_file: 'backend.tf'
-          var_file: 'variables.tf'
           requires:
             - approval-destroy # Zniszczenie wymaga zatwierdzenia
             - terraform/apply # Zniszczenie wymaga zakończonego zadania terraform/apply
