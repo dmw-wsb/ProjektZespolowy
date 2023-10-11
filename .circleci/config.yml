@@ -1,20 +1,46 @@
 version: 2.1
-
-jobs:
-  build:
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - run:
-          name: Build Job
-          command: echo "Running build job!"
+orbs:
+  terraform: circleci/terraform@3.2.1
 
 workflows:
   version: 2
-  main_workflow:
+  deploy-infrastructure:
     jobs:
-      - build:
+      - approval-plan: # Dodajemy zadanie zatwierdzenia przed planowaniem
+          type: approval
           filters:
             branches:
-              only:
-                - main
+              only: main
+      - terraform/plan:
+          context: your-context
+          backend_config_file: 'backend.tf'
+          var_file: 'variables.tf'
+          requires:
+            - approval-plan # Planowanie wymaga zatwierdzenia
+          filters:
+            branches:
+              only: main
+      - approval-destroy: # Dodajemy zadanie zatwierdzenia przed zniszczeniem
+          type: approval
+          filters:
+            branches:
+              only: main
+      - terraform/apply:
+          context: your-context
+          backend_config_file: 'backend.tf'
+          var_file: 'variables.tf'
+          requires:
+            - terraform/plan
+          filters:
+            branches:
+              only: main
+      - terraform/destroy: # Dodajemy zadanie terraform/destroy
+          context: your-context
+          backend_config_file: 'backend.tf'
+          var_file: 'variables.tf'
+          requires:
+            - approval-destroy # Zniszczenie wymaga zatwierdzenia
+            - terraform/apply # Zniszczenie wymaga zakończonego zadania terraform/apply
+          filters:
+            branches:
+              only: main
