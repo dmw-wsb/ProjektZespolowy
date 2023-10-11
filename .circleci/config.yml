@@ -2,36 +2,50 @@ version: 2.1
 orbs:
   terraform: circleci/terraform@3.2.1
 
+jobs:
+  checkout_code:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+
 workflows:
   version: 2
   deploy-infrastructure:
     jobs:
-      - approval-plan: # Dodajemy zadanie zatwierdzenia przed planowaniem
+      - checkout_code
+      - approval-plan:
           type: approval
+          requires:
+            - checkout_code
           filters:
             branches:
               only: main
       - terraform/plan:
           requires:
-            - approval-plan # Planowanie wymaga zatwierdzenia
+            - approval-plan
+            - checkout_code
           filters:
             branches:
               only: main
-      - approval-destroy: # Dodajemy zadanie zatwierdzenia przed zniszczeniem
+      - approval-destroy:
           type: approval
+          requires:
+            - terraform/plan
           filters:
             branches:
               only: main
       - terraform/apply:
           requires:
             - terraform/plan
+            - checkout_code
           filters:
             branches:
               only: main
-      - terraform/destroy: # Dodajemy zadanie terraform/destroy
+      - terraform/destroy:
           requires:
-            - approval-destroy # Zniszczenie wymaga zatwierdzenia
-            - terraform/apply # Zniszczenie wymaga zakończonego zadania terraform/apply
+            - approval-destroy
+            - terraform/apply
           filters:
             branches:
               only: main
