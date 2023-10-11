@@ -8,10 +8,21 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
+      - run:
+          name: Install Terraform
+          command: |
+            curl -LO https://releases.hashicorp.com/terraform/1.0.9/terraform_1.0.9_linux_amd64.zip
+            unzip terraform_1.0.9_linux_amd64.zip
+            sudo mv terraform /usr/local/bin/
+      - run:
+          name: Terraform Init
+          command: terraform init
       - persist_to_workspace:
           root: .
           paths:
             - "*"
+            - ".terraform/*"
+            - ".terraform.lock.hcl"
 
 workflows:
   version: 2
@@ -20,43 +31,40 @@ workflows:
       - checkout_code
       - approval-plan:
           type: approval
-          requires:
-            - checkout_code
           filters:
             branches:
               only: main
       - terraform/plan:
+          pre-steps:
+            - attach_workspace:
+                at: .
           requires:
             - approval-plan
+            - checkout_code
           filters:
             branches:
               only: main
-          pre-steps:  # These steps run before the orb's steps
-            - attach_workspace:
-                at: .
       - approval-destroy:
           type: approval
-          requires:
-            - terraform/plan
           filters:
             branches:
               only: main
       - terraform/apply:
+          pre-steps:
+            - attach_workspace:
+                at: .
           requires:
             - terraform/plan
           filters:
             branches:
               only: main
+      - terraform/destroy:
           pre-steps:
             - attach_workspace:
                 at: .
-      - terraform/destroy:
           requires:
             - approval-destroy
             - terraform/apply
           filters:
             branches:
               only: main
-          pre-steps:
-            - attach_workspace:
-                at: .
