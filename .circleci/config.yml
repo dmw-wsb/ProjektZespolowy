@@ -1,86 +1,82 @@
 version: 2.1
-orbs:
-  terraform: circleci/terraform@3.2.1
 
 jobs:
-  checkout_code:
+  plan-apply:
+    working_directory: /tmp/project
     docker:
-      - image: cimg/base:stable
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
       - checkout
       - run:
-          name: Install Terraform
+          name: terraform init & plan
           command: |
-            curl -LO https://releases.hashicorp.com/terraform/1.0.9/terraform_1.0.9_linux_amd64.zip
-            unzip terraform_1.0.9_linux_amd64.zip
-            sudo mv terraform /usr/local/bin/
-      - run:
-          name: Terraform Init
-          command: terraform init
+            ls -ltr ~/.ssh
+            terraform init -input=false
+            terraform plan -out tfapply -var-file terraform.tfvars
       - persist_to_workspace:
           root: .
           paths:
-            - "*"
-            - ".terraform/*"
-            - ".terraform.lock.hcl"
+            - .
+
   apply:
-    executor: terraform/default
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
       - attach_workspace:
           at: .
-      - terraform/apply:
-          path: .
+      - run:
+          name: terraform
+          command: |
+            terraform apply -auto-approve tfapply
       - persist_to_workspace:
           root: .
           paths:
-            - "*"
-            - ".terraform/*"
-            - ".terraform.lock.hcl"
+            - .
+
+  plan-destroy:
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform create destroy plan
+          command: |
+            terraform plan -destroy -out tfdestroy -var-file terraform.tfvars
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   destroy:
-    executor: terraform/default
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
       - attach_workspace:
           at: .
-      - terraform/destroy:
-          path: .
-
-
+      - run:
+          name: terraform destroy
+          command: |
+            terraform apply -auto-approve tfdestroy
 workflows:
-  version: 2
-  deploy-infrastructure:
+  version: 2.1
+  plan_approve_apply:
     jobs:
-      - checkout_code
-      - approval-plan:
+      - plan-apply
+      - hold-apply:
           type: approval
-          filters:
-            branches:
-              only: main
-      - terraform/plan:
-          pre-steps:
-            - attach_workspace:
-                at: .
           requires:
-            - approval-plan
-            - checkout_code
-          filters:
-            branches:
-              only: main
+            - plan-apply
       - apply:
           requires:
-            - terraform/plan
-          filters:
-            branches:
-              only: main
-      - approval-destroy:
+            - hold-apply
+      - plan-destroy:
+          requires:
+            - apply
+      - hold-destroy:
           type: approval
-          filters:
-            branches:
-              only: main
+          requires:
+            - plan-destroy
       - destroy:
           requires:
-            - approval-destroy
-            - apply
-          filters:
-            branches:
-              only: main
+            - hold-destroy
