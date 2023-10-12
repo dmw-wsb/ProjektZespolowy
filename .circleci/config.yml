@@ -8,7 +8,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: terraform init & plan
+          name: Terraform Init and Plan
+          command: |
+            terraform init
+            terraform plan
       - persist_to_workspace:
           root: .
           paths:
@@ -21,9 +24,9 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: terraform
+          name: Terraform Apply
           command: |
-            terraform apply -auto-approve tfapply
+            terraform apply -auto-approve
       - persist_to_workspace:
           root: .
           paths:
@@ -36,7 +39,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: terraform create destroy plan
+          name: Terraform Create Destroy Plan
           command: |
             terraform plan -destroy
       - persist_to_workspace:
@@ -51,28 +54,47 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: terraform destroy
+          name: Terraform Destroy
           command: |
-            terraform apply -auto-approve tfdestroy
+            terraform destroy -auto-approve
+
 workflows:
-  version: 2.1
+  version: 2
   plan_approve_apply:
     jobs:
-      - plan-apply
+      - plan-apply:
+          filters:
+            branches:
+              only: main
       - hold-apply:
           type: approval
           requires:
             - plan-apply
+          filters:
+            branches:
+              only: main
       - apply:
           requires:
             - hold-apply
+          filters:
+            branches:
+              only: main
       - plan-destroy:
           requires:
             - apply
+          filters:
+            branches:
+              only: main
       - hold-destroy:
           type: approval
           requires:
             - plan-destroy
+          filters:
+            branches:
+              only: main
       - destroy:
           requires:
             - hold-destroy
+          filters:
+            branches:
+              only: main
