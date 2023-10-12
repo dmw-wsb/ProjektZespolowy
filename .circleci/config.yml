@@ -23,6 +23,28 @@ jobs:
             - "*"
             - ".terraform/*"
             - ".terraform.lock.hcl"
+  apply:
+    executor: terraform/default
+    steps:
+      - attach_workspace:
+          at: .
+      - terraform/apply:
+          path: .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "*"
+            - ".terraform/*"
+            - ".terraform.lock.hcl"
+
+  destroy:
+    executor: terraform/default
+    steps:
+      - attach_workspace:
+          at: .
+      - terraform/destroy:
+          path: .
+
 
 workflows:
   version: 2
@@ -44,27 +66,21 @@ workflows:
           filters:
             branches:
               only: main
-      - approval-destroy:
-          type: approval
-          filters:
-            branches:
-              only: main
-      - terraform/apply:
-          pre-steps:
-            - attach_workspace:
-                at: .
+      - apply:
           requires:
             - terraform/plan
           filters:
             branches:
               only: main
-      - terraform/destroy:
-          pre-steps:
-            - attach_workspace:
-                at: .
+      - approval-destroy:
+          type: approval
+          filters:
+            branches:
+              only: main
+      - destroy:
           requires:
             - approval-destroy
-            - terraform/apply
+            - apply
           filters:
             branches:
               only: main
