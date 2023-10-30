@@ -33,3 +33,16 @@ Wykorzystanymi technologami będzie serverless AWS Lambda
     Używanie bezpiecznych metod autoryzacji i autentykacji.
     Zabezpieczenie funkcje Lambda, aby dane były dostępne tylko dla autoryzowanych użytkowników (za pomocą tokenów JWT i IAM).
     Regularna aktualizacja wszystkich bibliotek i zależności.
+   
+5. Deployment:
+
+    AWS Lambda współpracuje z API Gateway, co umożliwia łatwe wystawienie funkcji jako punktów końcowych API.
+    Wykorzystanie AWS S3 do przechowywania plików statycznych frontendu (HTML, CSS, JavaScript).
+    Zintegrowanie wszystkiego za pomocą AWS CloudFormation lub Serverless Framework, w celu uproszczenia procesu wdrażania.
+
+6. Monitorowanie i skalowanie:
+
+    Skonfigurowanie CloudWatch, aby monitorować działanie funkcji Lambda i być na bieżąco z wszelkimi problemami.
+    AWS Lambda automatycznie skaluje się w zależności od obciążenia, więc nie trzeba martwić się o skalowanie infrastruktury.
+
+Końcowy produkt będzie aplikacją webową dostosowaną do potrzeb alergików, której działanie będzie oparte na serverless i chmurze AWS.
